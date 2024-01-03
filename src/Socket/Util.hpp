@@ -2,6 +2,7 @@
 #define SOCKET_UTIL_HPP
 
 #include <functional>
+#include <winsock.h>
 
 namespace Socket_Util {
     // Internet Protocol Version enum
@@ -26,7 +27,7 @@ namespace Socket_Util {
     }
 
     // 分割逗号字符串
-    char** splitStr(const char* arg){
+    static char** splitStr(const char* arg){
         // 指针判空
         if (arg == nullptr) {
             return nullptr;

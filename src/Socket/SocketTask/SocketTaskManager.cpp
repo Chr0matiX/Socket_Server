@@ -4,6 +4,15 @@
 
 #include "SocketTaskManager.h"
 
+SocketTaskManager::~SocketTaskManager() {
+    // 怎么写都行，一个是迭代器指针，一个是键值对的引用
+    //for (auto it = map_TaskIndex.begin(); it != map_TaskIndex.end(); ++it) {
+    for (auto & it : map_TaskIndex) {
+        delete[] it.first;
+        delete it.second;
+    }
+}
+
 bool SocketTaskManager::addSocketTask(char* taskName, SocketTaskBase* task) {
     if (taskName == nullptr || task == nullptr) return false;
     // 不重复
@@ -21,15 +30,23 @@ bool SocketTaskManager::addSocketTask(char* taskName, SocketTaskBase* task) {
 }
 
 bool SocketTaskManager::removeSocketTask(char* taskName) {
+    if (taskName == nullptr) {
+        return false;
+    }
     // 存在键
     auto it = map_TaskIndex.find(taskName);
     if ( it == map_TaskIndex.end()) return false;
+
+    // 指针备份，防止迭代器失效无法访问
+    char* pFirst = it->first;
+    SocketTaskBase* pSecond = it->second;
+
     m_TaskIndexMapMutex.lock();
     try {
-        map_TaskIndex.erase(taskName); // 先操作容器
+        map_TaskIndex.erase(it); // 先操作容器
         // 如果没有抛出异常再释放
-        delete[] it->first;
-        delete[] it->second;
+        delete[] pFirst;
+        delete pSecond;
     } catch (const std::exception& e) {
         m_TaskIndexMapMutex.unlock();
         return false;
@@ -43,7 +60,7 @@ bool SocketTaskManager::runSocketTask(char* taskName, char* arg) {
     socketTask->m_arg = arg;
     socketTask->run();
     if (socketTask->cptS == SocketTaskBase::cptStatus::exce) {
-        std::exception e = socketTask->m_exception;
+        //std::exception e = socketTask->m_exception;
         socketTask->exceptionSafety(); // 发生异常，则执行异常安全函数
         return false;
     }

@@ -8,16 +8,25 @@
 #include <vector>
 #include <map>
 #include "SocketCore.h"
+#include "SocketTask/SocketTaskManager.h"
 
 class SocketServer {
 public:
-    // 创建Socket并加入到容器中
+    SocketServer();
+    ~SocketServer();
 
-    // 接收连接，获取消息
+    // 创建Socket对象并加入容器
+    static bool addSocket(char* socketName, char* ip, int port, Socket_Util::IPVersion ipv, Socket_Util::SocketType socketT, int waitingLength);
+
+    // 从容器中移除Socket对象
+    static bool removeSocket(char* socketName);
+
+    // 注册任务管理对象
+    SocketTaskManager* m_pSocketTaskManager;
 
 private:
     // Socket容器
-    std::map<char*, SocketCore> map_Sockets;
+    static std::map<char*, SocketCore*> map_Sockets;
 };
 
 

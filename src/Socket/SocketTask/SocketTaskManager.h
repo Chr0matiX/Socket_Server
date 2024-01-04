@@ -11,6 +11,7 @@
 
 class SocketTaskManager {
 public:
+    ~SocketTaskManager();
     // 添加任务，添加失败并不负责释放
     bool addSocketTask(char* taskName, SocketTaskBase* task);
 

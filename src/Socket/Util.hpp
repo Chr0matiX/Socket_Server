@@ -62,5 +62,19 @@ namespace Socket_Util {
         args[argsIndex][0] = '\0';
         return args;
     }
+
+    // 按照索引创建cstring
+    static char* splitIndex(char* cstring, int start, int end) {
+        int len = end - start;
+        if (len < 0) {
+            return nullptr;
+        }
+        char* rtn_string = new char[len + 1];
+        for (int i = 0; i < len; ++i) {
+            rtn_string[i] = cstring[start + i];
+        }
+        rtn_string[len] = '\0';
+        return rtn_string;
+    }
 }
 #endif // SOCKET_UTIL_HPP

@@ -7,9 +7,11 @@
 
 #include <winsock2.h>
 #include "Util.hpp"
+#include "SocketTask/SocketTaskManager.h"
 
 class SocketCore {
 private:
+    SocketTaskManager* m_pSocketTaskManager;
     // Socket
     unsigned long long int m_socketIndex;
 
@@ -29,12 +31,18 @@ private:
     // 等待队列的长度
     int m_WaitingLength;
 
-    SocketCore(char* ip, int port, char* socketName, Socket_Util::IPVersion ipv, Socket_Util::SocketType socketT, int waitingLength);
-    ~SocketCore();
+    SocketCore(char* ip, int port, char* socketName, Socket_Util::IPVersion ipv, Socket_Util::SocketType socketT, int waitingLength, SocketTaskManager* socketTaskManager);
+
+    // 循环接收连接并执行任务
+    void acceptAndTask();
+
+    // 停止接收信号
+    bool m_stopSignal;
 
 public:
+    ~SocketCore();
     // 创建一个Socket
-    static SocketCore* createSocketAndListen(char* IP, int port, char* socketName, Socket_Util::IPVersion iPv, Socket_Util::SocketType socketT, int waitingLength);
+    static SocketCore* createSocketAndListen(char* IP, int port, char* socketName, Socket_Util::IPVersion iPv, Socket_Util::SocketType socketT, int waitingLength, SocketTaskManager* socketTaskManager);
 
     // 获取Socket名称
     [[nodiscard]] const char* getName() const;

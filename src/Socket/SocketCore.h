@@ -6,6 +6,7 @@
 #define SOCKET_SERVER_SOCKETCORE_H
 
 #include <winsock2.h>
+#include <thread>
 #include "Util.hpp"
 #include "SocketTask/SocketTaskManager.h"
 
@@ -39,6 +40,9 @@ private:
     // 停止接收信号
     bool m_stopSignal;
 
+    // 维护循环接收连接的线程
+    std::thread m_thread;
+
 public:
     ~SocketCore();
     // 创建一个Socket
@@ -58,6 +62,9 @@ public:
 
     // 获取SocketType
     [[nodiscard]] Socket_Util::SocketType getSocketType() const;
+
+    // 开启循环接收，并使用线程维护
+    bool cycRec();
 };
 
 

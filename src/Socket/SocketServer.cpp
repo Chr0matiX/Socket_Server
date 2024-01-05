@@ -5,21 +5,23 @@
 #include "SocketServer.h"
 
 SocketServer::SocketServer() {
-    socketTaskManager = new SocketTaskManager();
+    m_pSocketTaskManager = new SocketTaskManager();
 }
 
 SocketServer::~SocketServer() {
 
 }
 
-bool SocketServer::addSocket(char* socketName, char* ip, int port, Socket_Util::IPVersion ipv, Socket_Util::SocketType socketT, int waitingLength) {
+bool SocketServer::addSocket(char* socketName, char* ip, int port, Socket_Util::IPVersion ipv, Socket_Util::SocketType socketT, int waitingLength, SocketTaskManager* pSocketTaskManager) {
     if (socketName == nullptr || ip == nullptr) {
         return false;
     }
-    SocketCore* socketCore = SocketCore::createSocketAndListen(ip, port, socketName, ipv, socketT, waitingLength);
+    SocketCore* socketCore = SocketCore::createSocketAndListen(ip, port, socketName, ipv, socketT, waitingLength, pSocketTaskManager);
     if (socketCore == nullptr) {
         return false;
     }
+    // 开启循环接收
+    socketCore->cycRec();
 
     map_Sockets[socketName] = socketCore;
     return true;

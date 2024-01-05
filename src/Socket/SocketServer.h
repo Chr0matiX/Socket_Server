@@ -16,7 +16,7 @@ public:
     ~SocketServer();
 
     // 创建Socket对象并加入容器
-    static bool addSocket(char* socketName, char* ip, int port, Socket_Util::IPVersion ipv, Socket_Util::SocketType socketT, int waitingLength);
+    static bool addSocket(char* socketName, char* ip, int port, Socket_Util::IPVersion ipv, Socket_Util::SocketType socketT, int waitingLength, SocketTaskManager* pSocketTaskManager);
 
     // 从容器中移除Socket对象
     static bool removeSocket(char* socketName);

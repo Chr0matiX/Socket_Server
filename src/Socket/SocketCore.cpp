@@ -36,7 +36,6 @@ SocketCore* SocketCore::createSocketAndListen(char* ip, int port, char* socketNa
         ret_SocketCore = nullptr;
         return nullptr;
     }
-
     return ret_SocketCore;
 }
 
@@ -109,5 +108,12 @@ void SocketCore::acceptAndTask() {
             }
         }
         m_pSocketTaskManager->runSocketTask(taskName, arg);
+        closesocket(clientSocket); // 关闭ClientSocket
     }
+    delete[] buffer;
+}
+
+bool SocketCore::cycRec() {
+    m_thread = std::thread(&SocketCore::acceptAndTask, this);
+    return true; // emmmmm，可以作为void吧，反正就一个操作，还是noexcept
 }

@@ -23,13 +23,20 @@ void buildAddTask::run() {
         }
         char* endprt;
         int addNum = std::strtol(args[i], &endprt, 10);
-        if (*endprt == '\0') {
-            return;
+        if (*endprt != '\0') {
+            continue;
         }
         AddTask* addTask = new AddTask(
                 f_add,
                 SocketServerGlobal::gl_pNumber,
                 addNum);
-        SocketServerGlobal::threadPool->addTask(addTask);
+        SocketServerGlobal::gl_pThreadPool->addTask(addTask);
+    }
+    for (int i = 0; ; i++) {
+        if (args[i][0] == '\0') {
+            delete[] args[i];
+            break;
+        }
+        delete[] args[i];
     }
 }

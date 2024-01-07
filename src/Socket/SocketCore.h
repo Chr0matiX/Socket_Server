@@ -12,6 +12,7 @@
 
 class SocketCore {
 private:
+    // 依赖注入，Socket任务管理器
     SocketTaskManager* m_pSocketTaskManager;
     // Socket
     unsigned long long int m_socketIndex;

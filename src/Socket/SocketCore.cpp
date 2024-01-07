@@ -54,6 +54,8 @@ SocketCore::SocketCore(char* ip, int port, char* socketName, Socket_Util::IPVers
 }
 
 SocketCore::~SocketCore(){
+    m_stopSignal = true; // 停止循环接受
+    m_thread.join(); // 等待线程结束
     closesocket(m_socketIndex);
     delete[] m_IP; // RAII
     m_IP = nullptr;
@@ -103,14 +105,17 @@ void SocketCore::acceptAndTask() {
         for (int i = 0; buffer[i] != 0; ++i) {
             if (buffer[i] == ',') { // 碰到的第一个逗号
                 taskName = Socket_Util::splitIndex(buffer, 0, i);
-                arg = Socket_Util::splitIndex(buffer, i + 1, strlen(buffer) + 1);
+                arg = Socket_Util::splitIndex(buffer, i + 1, strlen(buffer)); // 此处不需要+1，注意end的位置，意义是需要复制部分的后一位
                 break;
             }
         }
         m_pSocketTaskManager->runSocketTask(taskName, arg);
+        delete[] taskName;
+        delete[] arg;
         closesocket(clientSocket); // 关闭ClientSocket
     }
     delete[] buffer;
+    buffer = nullptr;
 }
 
 bool SocketCore::cycRec() {

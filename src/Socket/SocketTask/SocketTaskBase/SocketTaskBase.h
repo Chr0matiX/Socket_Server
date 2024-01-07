@@ -9,6 +9,8 @@
 #include "../../../Task/TaskBase.h"
 
 class SocketTaskBase : public TaskBase {
+private:
+
 public:
     char* m_arg;
     virtual ~SocketTaskBase();

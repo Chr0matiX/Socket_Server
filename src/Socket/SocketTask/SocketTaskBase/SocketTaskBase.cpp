@@ -3,6 +3,7 @@
 //
 
 #include "SocketTaskBase.h"
+#include <cstring>
 
 SocketTaskBase::~SocketTaskBase() noexcept {
     delete[] m_arg;

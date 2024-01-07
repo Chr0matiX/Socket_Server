@@ -18,7 +18,7 @@ namespace Socket_Util {
     };
 
     // 初始化Socket库，固定使用2.2
-    static bool initalizeSocket() {
+    static bool initializeSocket() {
         WSADATA wsaData;    // 用于保存winsock库信息的结构体
         if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
             return false;
@@ -76,5 +76,17 @@ namespace Socket_Util {
         rtn_string[len] = '\0';
         return rtn_string;
     }
+
+    static char* deepCopy(char* cstring) {
+        char* rtn_cstring = new char[strlen(cstring) + 1];
+        strcpy(rtn_cstring, cstring);
+        return rtn_cstring;
+    }
+
+    struct mapCharPCmp {
+        bool operator()(const char* cstring1, const char* cstring2) const {
+            return strcmp(cstring1, cstring2) < 0;
+        }
+    };
 }
 #endif // SOCKET_UTIL_HPP

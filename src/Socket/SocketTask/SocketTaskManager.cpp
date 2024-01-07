@@ -16,11 +16,17 @@ SocketTaskManager::~SocketTaskManager() {
 bool SocketTaskManager::addSocketTask(char* taskName, SocketTaskBase* task) {
     if (taskName == nullptr || task == nullptr) return false;
     // 不重复
-    if (auto it = map_TaskIndex.find(taskName); it != map_TaskIndex.end()) return false;
+    try {
+        auto it = map_TaskIndex.find(taskName);
+        if (it != map_TaskIndex.end()) return false;
+    } catch (const std::exception& e) {
 
+    }
+
+    char* tName = Socket_Util::deepCopy(taskName); // 深拷贝避免内存泄露
     m_TaskIndexMapMutex.lock();
     try {
-        map_TaskIndex[taskName] = task;
+        map_TaskIndex[tName] = task;
     } catch (const std::exception& e) {
         m_TaskIndexMapMutex.unlock();
         return false;

@@ -7,9 +7,8 @@ add_executable(
         Socket_Server
         main.cpp
 
-        src/test.hpp
         src/Socket/Util.hpp
-        src/Task/Util.hpp
+        src/Global.hpp
 
         src/Socket/SocketCore.cpp
         src/Socket/SocketCore.h
@@ -34,9 +33,9 @@ add_executable(
 
         src/Socket/SocketTask/SocketTaskManager.cpp
         src/Socket/SocketTask/SocketTaskManager.h
-        src/Socket/SocketTask/UDTask/buildAddTask.cpp
 
         src/Socket/SocketTask/UDTask/buildAddTask.h
-        src/Global.hpp)
+        src/Socket/SocketTask/UDTask/buildAddTask.cpp
+)
 
 target_link_libraries(Socket_Server ws2_32)

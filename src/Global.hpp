@@ -5,10 +5,8 @@
 #include "ThreadPool/ThreadPool.h"
 
 namespace SocketServerGlobal {
-    Number* gl_pNumber;
-    ThreadPool* threadPool;
+    static Number *gl_pNumber;
+    static ThreadPool *gl_pThreadPool;
 }
-
-
 
 #endif // SOCKET_SERVER_GLOBAL_HPP

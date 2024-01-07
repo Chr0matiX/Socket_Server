@@ -8,6 +8,7 @@
 #include <map>
 #include <mutex>
 #include "SocketTaskBase/SocketTaskBase.h"
+#include "../Util.hpp"
 
 class SocketTaskManager {
 public:
@@ -22,7 +23,7 @@ public:
     bool runSocketTask(char* taskName, char* arg);
 
 private:
-    std::map<char*, SocketTaskBase*> map_TaskIndex;
+    std::map<char*, SocketTaskBase*, Socket_Util::mapCharPCmp> map_TaskIndex;
     std::mutex m_TaskIndexMapMutex;
 };
 

@@ -4,16 +4,30 @@
 
 #include "SocketServer.h"
 
+// 静态成员的初始化
+std::map<char*, SocketCore*> SocketServer::map_Sockets;
+SocketTaskManager* SocketServer::m_pSocketTaskManager = nullptr;
+
 SocketServer::SocketServer() {
     m_pSocketTaskManager = new SocketTaskManager();
 }
 
 SocketServer::~SocketServer() {
-
+    for (auto& it : map_Sockets) {
+        delete it.second; // 先停止循环接收
+        delete[] it.first;
+        //it.first = nullptr; // 不被允许，it.first的类型为char* const，所以无法修改指针本身的值
+    }
+    map_Sockets.clear();
+    delete m_pSocketTaskManager;
+    m_pSocketTaskManager = nullptr;
 }
 
 bool SocketServer::addSocket(char* socketName, char* ip, int port, Socket_Util::IPVersion ipv, Socket_Util::SocketType socketT, int waitingLength, SocketTaskManager* pSocketTaskManager) {
     if (socketName == nullptr || ip == nullptr) {
+        return false;
+    }
+    if (auto it = map_Sockets.find(socketName); it != map_Sockets.end()) { // 名称重复
         return false;
     }
     SocketCore* socketCore = SocketCore::createSocketAndListen(ip, port, socketName, ipv, socketT, waitingLength, pSocketTaskManager);
@@ -42,8 +56,8 @@ bool SocketServer::removeSocket(char* socketName) {
 
     try {
         map_Sockets.erase(it);
-        delete[] it->first;
-        delete it->second;
+        delete[] pFirst;
+        delete pSecond;
     } catch (const std::exception& e) {
         return false;
     }

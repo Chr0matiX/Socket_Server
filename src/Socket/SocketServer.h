@@ -16,13 +16,13 @@ public:
     ~SocketServer();
 
     // 创建Socket对象并加入容器
-    static bool addSocket(char* socketName, char* ip, int port, Socket_Util::IPVersion ipv, Socket_Util::SocketType socketT, int waitingLength, SocketTaskManager* pSocketTaskManager);
+    static bool addSocket(char* socketName, char* ip, int port, Socket_Util::IPVersion ipv, Socket_Util::SocketType socketT, int waitingLength, SocketTaskManager* pSocketTaskManager = m_pSocketTaskManager);
 
     // 从容器中移除Socket对象
     static bool removeSocket(char* socketName);
 
-    // 注册任务管理对象
-    SocketTaskManager* m_pSocketTaskManager;
+    // 任务管理对象
+    static SocketTaskManager* m_pSocketTaskManager;
 
 private:
     // Socket容器

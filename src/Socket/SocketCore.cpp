@@ -4,16 +4,19 @@
 
 #include "SocketCore.h"
 #include <cstring>
+#include <iostream>
 
 SocketCore* SocketCore::createSocketAndListen(char* ip, int port, char* socketName, Socket_Util::IPVersion ipv, Socket_Util::SocketType socketT, int waitingLength, SocketTaskManager* socketTaskManager) {
     // 指针判空
     if (ip == nullptr || socketName == nullptr) {
+        std::cout << "[Error]\tSocketCore::createSocketAndListen failed.\tip/socketName is nullptr.\n";
         return nullptr;
     }
 
     SocketCore* ret_SocketCore = new SocketCore(ip, port, socketName, ipv, socketT, waitingLength, socketTaskManager);
     // 初始化失败，释放内存
     if (ret_SocketCore->m_socketIndex == INVALID_SOCKET) {
+        std::cout << "[Error]\tSocketCore::createSocketAndListen failed.\t\"new SocketCore failed.\"\n";
         delete ret_SocketCore;
         ret_SocketCore = nullptr;
         return nullptr;
@@ -25,6 +28,7 @@ SocketCore* SocketCore::createSocketAndListen(char* ip, int port, char* socketNa
     serverAddr.sin_addr.S_un.S_addr = inet_addr(ret_SocketCore->m_IP);
     serverAddr.sin_port = htons(ret_SocketCore->m_Port);
     if (bind(ret_SocketCore->m_socketIndex, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
+        std::cout << "[Error]\tSocketCore::createSocketAndListen failed.\t\"bind failed.\"\n";
         delete ret_SocketCore;
         ret_SocketCore = nullptr;
         return nullptr;
@@ -32,10 +36,22 @@ SocketCore* SocketCore::createSocketAndListen(char* ip, int port, char* socketNa
 
     // 开启监听
     if (listen(ret_SocketCore->m_socketIndex, ret_SocketCore->m_WaitingLength) == -1) {
+        std::cout << "[Error]\tSocketCore::createSocketAndListen failed.\t\"listen failed.\"\n";
         delete ret_SocketCore;
         ret_SocketCore = nullptr;
         return nullptr;
     }
+
+    // 设置非阻塞模式
+    u_long mode = 1;
+    if (ioctlsocket(ret_SocketCore->m_socketIndex, FIONBIO, &mode) != 0) {
+        std::cout << "[Error]\tSocketCore::createSocketAndListen failed.\t\"ioctl-socket failed.\"\n";
+        delete ret_SocketCore;
+        ret_SocketCore = nullptr;
+        return nullptr;
+    }
+
+    std::cout << "[Info]\tSocketCore::createSocketAndListen succeed.\n";
     return ret_SocketCore;
 }
 
@@ -54,13 +70,18 @@ SocketCore::SocketCore(char* ip, int port, char* socketName, Socket_Util::IPVers
 }
 
 SocketCore::~SocketCore(){
-    m_stopSignal = true; // 停止循环接受
-    m_thread.join(); // 等待线程结束
+    if (m_thread.joinable()) {
+        m_thread.join(); // 等待线程结束
+        std::cout << "[Info]\t" << m_SocketName << "m_thread join succeed.\n";
+    }
     closesocket(m_socketIndex);
     delete[] m_IP; // RAII
     m_IP = nullptr;
+    char sName[strlen(m_SocketName) + 1];
+    strcpy(sName, m_SocketName);
     delete[] m_SocketName; // RAII
     m_SocketName = nullptr;
+    std::cout << "[Info]\t" << sName << "release succeed.\n";
 }
 
 const char* SocketCore::getName() const {
@@ -90,9 +111,10 @@ void SocketCore::acceptAndTask() {
         // 接收连接
         int clientLength = sizeof(clientAddress);
         unsigned long long int clientSocket = accept(m_socketIndex, (struct sockaddr*)&clientAddress, &clientLength);
-        if (clientSocket == -1) { // 连接失败
+        if (clientSocket == -1) { // 连接失败, 或没有连接
             continue; // 准备接收下一次连接
         }
+        std::cout << "[Info]\t" << m_SocketName << "accept succeed.\n";
 
         // 获取消息
         int bytesRead = recv(clientSocket, buffer, 1024, 0);
@@ -109,16 +131,20 @@ void SocketCore::acceptAndTask() {
                 break;
             }
         }
-        m_pSocketTaskManager->runSocketTask(taskName, arg);
+        if (!m_pSocketTaskManager->runSocketTask(taskName, arg)) {
+            std::cout << "[Warn]\tRun Socket Task failed.\ttaskName = " << taskName << ", arg = " << arg << std::endl;
+        }
         delete[] taskName;
         delete[] arg;
         closesocket(clientSocket); // 关闭ClientSocket
     }
     delete[] buffer;
     buffer = nullptr;
+    std::cout << "[Info]\t" << m_SocketName << "cycRec-thread quit.\n";
 }
 
 bool SocketCore::cycRec() {
     m_thread = std::thread(&SocketCore::acceptAndTask, this);
+    std::cout << "[Info]\t" << m_SocketName << "sysRec-thread run.\n";
     return true; // emmmmm，可以作为void吧，反正就一个操作，还是noexcept
 }

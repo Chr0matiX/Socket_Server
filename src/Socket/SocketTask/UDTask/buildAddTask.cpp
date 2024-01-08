@@ -7,6 +7,7 @@
 #include "../../../Task/Math/AddTask.h"
 #include "../../../Global.hpp"
 #include "../../../ThreadPool/ThreadPool.h"
+#include <iostream>
 
 static void f_add(Number* pNum, int addNum) {
     pNum->add(addNum);
@@ -15,6 +16,7 @@ static void f_add(Number* pNum, int addNum) {
 void buildAddTask::run() {
     char** args = Socket_Util::splitStr(m_arg);
     if (args == nullptr) {
+        std::cout << "[Error]\tbuildAddTask::run/Socket_Util::splitStr failed.\tm_arg = " << m_arg << std::endl;
         return;
     }
     for (int i = 0; ; i++) {
@@ -24,6 +26,7 @@ void buildAddTask::run() {
         char* endprt;
         int addNum = std::strtol(args[i], &endprt, 10);
         if (*endprt != '\0') {
+            std::cout << "[Warn]\tCstring to int failed.\targs[" << i << "] = " << args[i] << std::endl;
             continue;
         }
         AddTask* addTask = new AddTask(
@@ -39,4 +42,5 @@ void buildAddTask::run() {
         }
         delete[] args[i];
     }
+    std::cout << "[Info]\tbuildAddTask::run succeed.\n";
 }

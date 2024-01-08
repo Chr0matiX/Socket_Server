@@ -38,13 +38,13 @@ private:
     // 循环接收连接并执行任务
     void acceptAndTask();
 
-    // 停止接收信号
-    bool m_stopSignal;
-
     // 维护循环接收连接的线程
     std::thread m_thread;
 
 public:
+    // 停止接收信号
+    bool m_stopSignal;
+
     ~SocketCore();
     // 创建一个Socket
     static SocketCore* createSocketAndListen(char* IP, int port, char* socketName, Socket_Util::IPVersion iPv, Socket_Util::SocketType socketT, int waitingLength, SocketTaskManager* socketTaskManager);

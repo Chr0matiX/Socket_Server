@@ -12,9 +12,6 @@
 
 class SocketServer {
 public:
-    SocketServer();
-    ~SocketServer();
-
     // 创建Socket对象并加入容器
     static bool addSocket(char* socketName, char* ip, int port, Socket_Util::IPVersion ipv, Socket_Util::SocketType socketT, int waitingLength, SocketTaskManager* pSocketTaskManager = m_pSocketTaskManager);
 
@@ -24,9 +21,17 @@ public:
     // 任务管理对象
     static SocketTaskManager* m_pSocketTaskManager;
 
+    // 初始化服务器
+    static bool initializeSocketServer();
+
+    // 释放服务器
+    static bool deleteSocketServer();
+
 private:
     // Socket容器
     static std::map<char*, SocketCore*> map_Sockets;
+    // 单例
+    SocketServer();
 };
 
 

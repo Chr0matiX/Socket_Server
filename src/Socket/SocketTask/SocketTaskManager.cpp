@@ -76,9 +76,10 @@ bool SocketTaskManager::removeSocketTask(char* taskName) {
 bool SocketTaskManager::runSocketTask(char* taskName, char* arg) {
     auto it = map_TaskIndex.find(taskName);
     if (it == map_TaskIndex.end()) {
-        std::cout << "[Warn]\tSocketTaskManager::runSocketTask failed.\t" << taskName << "not found.\n";
+        std::cout << "[Warn]\tSocketTaskManager::runSocketTask failed.\t" << taskName << " not found.\n";
         return false;
     }
+    std::cout << "[Info]\tSocket-Task found:\t" << taskName << std::endl;
 
     SocketTaskBase* socketTask = it->second;
     socketTask->m_arg = arg;

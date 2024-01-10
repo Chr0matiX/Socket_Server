@@ -107,6 +107,7 @@ Socket_Util::SocketType SocketCore::getSocketType() const {
 void SocketCore::acceptAndTask() {
     struct sockaddr_in clientAddress;
     char* buffer = new char[1024];
+
     while (!m_stopSignal) {
         // 接收连接
         int clientLength = sizeof(clientAddress);
@@ -114,7 +115,7 @@ void SocketCore::acceptAndTask() {
         if (clientSocket == -1) { // 连接失败, 或没有连接
             continue; // 准备接收下一次连接
         }
-        std::cout << "[Info]\t" << m_SocketName << "accept succeed.\n";
+        std::cout << "[Info]\t" << m_SocketName << " accept succeed.\n";
 
         // 获取消息
         int bytesRead = recv(clientSocket, buffer, 1024, 0);
@@ -144,7 +145,7 @@ void SocketCore::acceptAndTask() {
 }
 
 bool SocketCore::cycRec() {
-    m_thread = std::thread(&SocketCore::acceptAndTask, this);
-    std::cout << "[Info]\t" << m_SocketName << "sysRec-thread run.\n";
+    m_thread = std::move(std::thread(&SocketCore::acceptAndTask, this));
+    std::cout << "[Info]\t" << m_SocketName << " sysRec-thread run.\n";
     return true; // emmmmm，可以作为void吧，反正就一个操作，还是noexcept
 }

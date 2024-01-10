@@ -41,7 +41,7 @@ ThreadPool::ThreadPool(int size) : m_ThreadPoolStop(false) {
 }
 
 bool ThreadPool::addTask(TaskBase* task) {
-    if (task == nullptr || m_ThreadPoolStop) {
+    if ((task == nullptr) || m_ThreadPoolStop) {
         std::cout << "[Warn]\tThreadPool::addTask failed.\ttask is nullptr or ThreadPool is stop.\n";
         return false;
     }

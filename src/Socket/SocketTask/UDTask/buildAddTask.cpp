@@ -5,7 +5,7 @@
 #include "buildAddTask.h"
 #include "../../Util.hpp"
 #include "../../../Task/Math/AddTask.h"
-#include "../../../Global.hpp"
+#include "../../../Global.h"
 #include "../../../ThreadPool/ThreadPool.h"
 #include <iostream>
 
